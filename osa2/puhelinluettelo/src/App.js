@@ -70,7 +70,10 @@ const App = () => {
     if (persons.find(person => person.name === newName))
       alert(`${newName} is already added to phonebook`);
     else if (newName.length && newNumber.length) {
-      setPersons(persons.concat({ name: newName, number: newNumber }));
+      axios
+        .post('./backend/persons', { name: newName, number: newNumber })
+        .then(res => setPersons(persons.concat(res.data)))
+      //setPersons(persons.concat({ name: newName, number: newNumber }));
       setNewName("") || setNewNumber("");
     }
   };
