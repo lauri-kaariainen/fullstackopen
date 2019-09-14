@@ -33,13 +33,13 @@
     {
       "content": "Testing write",
       "date": "2019-09-14T19:30:32.316Z",
-      "important": false,
+      "important": true,
       "id": 6
     },
     {
       "content": "Test 2 öäåä",
       "date": "2019-09-14T20:17:12.993Z",
-      "important": true,
+      "important": false,
       "id": 7
     },
     {
