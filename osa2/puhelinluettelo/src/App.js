@@ -85,16 +85,24 @@ const App = () => {
   },
     []);
 
+  const replaceNumber = (person, newNumber) =>
+    personsService
+      .changeNumber(person, newNumber)
+
+
 
   const submitName = event => {
     event.preventDefault();
-    if (persons.find(person => person.name === newName))
-      alert(`${newName} is already added to phonebook`);
+    const foundPerson = persons.find(person => person.name === newName);
+    if (foundPerson) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`))
+        replaceNumber(foundPerson, newNumber)
+          .then(data => setPersons(persons.map(person => person.id === foundPerson.id ? data : person)))
+    }
     else if (newName.length && newNumber.length) {
       personsService
         .submitPerson({ name: newName, number: newNumber })
-        .then(person => setPersons(persons.concat(person)))
-
+        .then(person => setPersons(persons.concat(person)));
       setNewName("") || setNewNumber("");
     }
   };
