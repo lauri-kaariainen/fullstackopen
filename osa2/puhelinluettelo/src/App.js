@@ -10,9 +10,21 @@ const Filter = ({ setFilterString }) => {
   );
 };
 
+const SinglePerson = ({ person, handleDelete }) =>
+  < div > {person.name + " - " + person.number}
+    <button onClick={() => handleDelete(person.id)}> delete</button>
+  </div >
 
 
-const Persons = ({ persons, filterString }) => {
+
+const Persons = ({ persons, filterString, setPersons }) => {
+  const handleDelete = id =>
+    personsService
+      .deletePerson(id)
+      .then(
+        personsService
+          .getAll()
+          .then(setPersons))
   return (
     <div>
       {persons
@@ -21,9 +33,9 @@ const Persons = ({ persons, filterString }) => {
             !filterString.length ||
             person.name.toLowerCase().includes(filterString.toLowerCase())
         )
-        .map(person => (
-          <div key={person.name}>{person.name + " - " + person.number}</div>
-        ))}
+        .map(person =>
+          <SinglePerson key={person.id} person={person} handleDelete={handleDelete} />)
+      }
     </div>
   );
 };
@@ -81,11 +93,6 @@ const App = () => {
         .submitPerson({ name: newName, number: newNumber })
         .then(person => setPersons(persons.concat(person)))
 
-
-      // axios
-      //   .post('./backend/persons', { name: newName, number: newNumber })
-      //   .then(res => setPersons(persons.concat(res.data)))
-      //setPersons(persons.concat({ name: newName, number: newNumber }));
       setNewName("") || setNewNumber("");
     }
   };
@@ -103,7 +110,7 @@ const App = () => {
         setNewNumber={setNewNumber}
       />
       <h2>Numbers</h2>
-      <Persons persons={persons} filterString={filterString} />
+      <Persons persons={persons} filterString={filterString} setPersons={setPersons} />
     </div>
   );
 };
