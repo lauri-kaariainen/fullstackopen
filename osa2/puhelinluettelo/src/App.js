@@ -12,19 +12,21 @@ const Filter = ({ setFilterString }) => {
 
 const SinglePerson = ({ person, handleDelete }) =>
   < div > {person.name + " - " + person.number}
-    <button onClick={() => handleDelete(person.id)}> delete</button>
+    <button onClick={() => handleDelete(person)}> delete</button>
   </div >
 
 
 
 const Persons = ({ persons, filterString, setPersons }) => {
-  const handleDelete = id =>
-    personsService
-      .deletePerson(id)
-      .then(
-        personsService
-          .getAll()
-          .then(setPersons))
+  const handleDelete = person => {
+    if (window.confirm(`Delete ${person.name}?`))
+      personsService
+        .deletePerson(person.id)
+        .then(
+          personsService
+            .getAll()
+            .then(setPersons))
+  }
   return (
     <div>
       {persons
