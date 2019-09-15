@@ -1,6 +1,24 @@
 import React, { useState, useEffect } from "react";
 import personsService from './services/persons'
 
+const Notification = ({ message, color }) => {
+  if (!message) {
+    return null
+  }
+
+  return (
+    <div className={"notification " + color}>
+      {message}
+    </div>
+  )
+}
+const ErrorNotification = ({ message }) =>
+  <Notification message={message} color={"red"} />
+
+const SuccessNotification = ({ message }) =>
+  <Notification message={message} color={"green"} />
+
+
 const Filter = ({ setFilterString }) => {
   return (
     <div>
@@ -17,7 +35,7 @@ const SinglePerson = ({ person, handleDelete }) =>
 
 
 
-const Persons = ({ persons, filterString, setPersons }) => {
+const Persons = ({ persons, filterString, setPersons, setSuccessMessage }) => {
   const handleDelete = person => {
     if (window.confirm(`Delete ${person.name}?`))
       personsService
@@ -26,6 +44,10 @@ const Persons = ({ persons, filterString, setPersons }) => {
           personsService
             .getAll()
             .then(setPersons))
+        .then(() => {
+          setSuccessMessage(`Deleted ${person.name}`);
+          setTimeout(() => setSuccessMessage(""), 5000);
+        })
   }
   return (
     <div>
@@ -72,10 +94,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filterString, setFilterString] = useState("");
   const [persons, setPersons] = useState([]);
-
-  console.log("persons:", persons)
-
-
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
 
   useEffect(() => {
@@ -88,6 +108,11 @@ const App = () => {
   const replaceNumber = (person, newNumber) =>
     personsService
       .changeNumber(person, newNumber)
+      .then(res => {
+        setSuccessMessage(`Changed ${newName}'s number to ${newNumber}`);
+        setTimeout(() => setSuccessMessage(""), 5000);
+        return res;
+      })
 
 
 
@@ -96,20 +121,29 @@ const App = () => {
     const foundPerson = persons.find(person => person.name === newName);
     if (foundPerson) {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`))
-        replaceNumber(foundPerson, newNumber)
+        return replaceNumber(foundPerson, newNumber)
           .then(data => setPersons(persons.map(person => person.id === foundPerson.id ? data : person)))
+          .catch(error => {
+            setErrorMessage(`Information of ${foundPerson.name} has already been removed from server`)
+            setTimeout(() => setErrorMessage(""), 5000)
+            setPersons(persons.filter(person => person.id !== foundPerson.id))
+          })
     }
     else if (newName.length && newNumber.length) {
       personsService
         .submitPerson({ name: newName, number: newNumber })
         .then(person => setPersons(persons.concat(person)));
       setNewName("") || setNewNumber("");
+      setSuccessMessage(`Added ${newName}`);
+      setTimeout(() => setSuccessMessage(""), 5000);
     }
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <SuccessNotification message={successMessage} />
+      <ErrorNotification message={errorMessage} />
       <Filter setFilterString={setFilterString} />
       <h2>Add a new</h2>
       <PersonForm
@@ -120,7 +154,11 @@ const App = () => {
         setNewNumber={setNewNumber}
       />
       <h2>Numbers</h2>
-      <Persons persons={persons} filterString={filterString} setPersons={setPersons} />
+      <Persons
+        persons={persons}
+        filterString={filterString}
+        setPersons={setPersons}
+        setSuccessMessage={setSuccessMessage} />
     </div>
   );
 };
