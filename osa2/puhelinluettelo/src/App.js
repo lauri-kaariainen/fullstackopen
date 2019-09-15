@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
+import personsService from './services/persons'
 
 const Filter = ({ setFilterString }) => {
   return (
@@ -9,6 +9,8 @@ const Filter = ({ setFilterString }) => {
     </div>
   );
 };
+
+
 
 const Persons = ({ persons, filterString }) => {
   return (
@@ -56,11 +58,16 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filterString, setFilterString] = useState("");
   const [persons, setPersons] = useState([]);
+
   console.log("persons:", persons)
+
+
+
+
   useEffect(() => {
-    axios
-      .get('./backend/persons')
-      .then(res => setPersons(res.data))
+    personsService.getAll()
+      .then(setPersons)
+
   },
     []);
 
@@ -70,9 +77,14 @@ const App = () => {
     if (persons.find(person => person.name === newName))
       alert(`${newName} is already added to phonebook`);
     else if (newName.length && newNumber.length) {
-      axios
-        .post('./backend/persons', { name: newName, number: newNumber })
-        .then(res => setPersons(persons.concat(res.data)))
+      personsService
+        .submitPerson({ name: newName, number: newNumber })
+        .then(person => setPersons(persons.concat(person)))
+
+
+      // axios
+      //   .post('./backend/persons', { name: newName, number: newNumber })
+      //   .then(res => setPersons(persons.concat(res.data)))
       //setPersons(persons.concat({ name: newName, number: newNumber }));
       setNewName("") || setNewNumber("");
     }
