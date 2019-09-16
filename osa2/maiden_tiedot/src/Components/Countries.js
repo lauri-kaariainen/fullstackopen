@@ -1,21 +1,6 @@
-import React, { useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import Weather from "./Weather.js";
 
-const getMostSimilarCountry = (countryName, arrayOfCountries) => {
-  const perfectMatch = arrayOfCountries.find(
-    country1 => countryName === country1.name
-  );
-  if (perfectMatch) return perfectMatch;
-  const caseInperfectMatch = arrayOfCountries.find(
-    country1 => countryName.toLowerCase() === country1.name.toLowerCase()
-  );
-  if (caseInperfectMatch) return caseInperfectMatch;
-  else
-    return arrayOfCountries.filter(country1 =>
-      country1.name.toLowerCase().includes(countryName.toLowerCase())
-    )[0];
-};
 
 const LessThan11CountriesDisplay = ({ visibleCountries, setSearchTerm }) => (
   <>
@@ -42,33 +27,21 @@ const SingleCountryDisplay = ({ singleCountryData }) => (
     <img
       alt={singleCountryData.name + "'s flag"}
       src={singleCountryData.flag}
-      height={"200px"}
+      height={"120px"}
     />
     <Weather location={singleCountryData.capital} />
   </div>
 );
 
 const SingleCountry = ({
-  countryName,
   singleCountryData,
-  setSingleCountryData
 }) => {
-  useEffect(() => {
-    console.log("SingleCountry effect loaded:", countryName);
-    axios
-      .get("https://restcountries.eu/rest/v2/name/" + countryName)
-      .then(
-        res =>
-          console.log(res.data) ||
-          setSingleCountryData(getMostSimilarCountry(countryName, res.data))
-      );
-  }, [countryName, setSingleCountryData]);
   return (
     <>
       {singleCountryData.name ? (
         <SingleCountryDisplay singleCountryData={singleCountryData} />
       ) : (
-          <div>Loading:{" " + countryName}</div>
+          <div>Loading:{"..."}</div>
         )}
     </>
   );
