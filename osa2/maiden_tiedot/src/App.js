@@ -52,6 +52,12 @@ const App = () => {
       .find(
         country => country.name.toLowerCase() === searchTerm.toLowerCase())
 
+  console.log(
+    "length", visibleCountries.length,
+    "perfectmatch", perfectMatch,
+    "showSingleCountry", showSingleCountry,
+    "singeCtrydata", singleCountryData ? singleCountryData.name : undefined)
+
   if ((visibleCountries.length === 1 || perfectMatch) && !showSingleCountry)
     setShowSingleCountry(true);
 

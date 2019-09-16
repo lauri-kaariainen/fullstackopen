@@ -50,18 +50,17 @@ const SingleCountry = ({
 const Countries = ({
   visibleCountries,
   singleCountryData,
-  setSingleCountryData,
-  setSearchTerm
+  setSearchTerm,
+  showSingleCountry
 }) => {
   return (
     <div>
       {!visibleCountries.length ? (
         <div>no countries found with search term</div>
-      ) : visibleCountries.length === 1 ? (
+      ) : showSingleCountry ? (
         <SingleCountry
           countryName={visibleCountries[0].name}
           singleCountryData={singleCountryData}
-          setSingleCountryData={setSingleCountryData}
         />
       ) : visibleCountries.length > 10 ? (
         <div>too many hits with search term: {visibleCountries.length}</div>
